@@ -50,6 +50,9 @@ const userSchema = new mongoose.Schema(
     person6_deposit: {
       type: Number,
     },
+    total_no_of_person: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

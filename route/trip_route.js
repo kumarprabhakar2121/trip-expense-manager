@@ -3,14 +3,12 @@ const router = express.Router();
 
 var tripCtrl = require("../controller/tripCtrl");
 
-router.route("/").post(tripCtrl.add);
+router.route("/").post(tripCtrl.add).get(tripCtrl.getAllTrips);
 
 router
   .route("/:trip_id")
   .get(tripCtrl.getTrip)
   .put(tripCtrl.update)
   .delete(tripCtrl.deleteTrip);
-
-router.route("/list").get(tripCtrl.getAllTrips);
 
 module.exports = router;

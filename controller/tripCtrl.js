@@ -1,7 +1,9 @@
 require("dotenv").config();
 const Trip = require("../model/Trip");
+const mongoose = require("mongoose");
 
 let add = async (req, res) => {
+  console.log(req.body);
   const {
     trip_name,
     description,
@@ -17,9 +19,10 @@ let add = async (req, res) => {
     person4_deposit,
     person5_deposit,
     person6_deposit,
+    total_no_of_person,
   } = req.body;
 
-  if (trip_name && person1_deposit && person1_name) {
+  if (trip_name && person1_deposit && person1_name && total_no_of_person) {
     try {
       const addOperation = await Trip.create({
         trip_name,
@@ -36,6 +39,7 @@ let add = async (req, res) => {
         person4_deposit,
         person5_deposit,
         person6_deposit,
+        total_no_of_person,
       });
       if (addOperation) {
         //saved
@@ -125,19 +129,25 @@ let getAllTrips = async (req, res) => {
 
 let getTrip = async (req, res) => {
   try {
-    const result = await Trip.findById(trip_id);
-    if (result) {
-      res.json({
-        success: true,
-        msg: "Result found",
-        result,
-      });
-    } else {
-      res.json({
-        success: false,
-        msg: " Result not found",
-      });
-    }
+  if (!mongoose.isValidObjectId(req.params.trip_id)) {
+    return res.json({
+      success: false,
+      msg: `bad object id`,
+    });
+  }
+  const result = await Trip.findById(req.params.trip_id);
+  if (result) {
+    res.json({
+      success: true,
+      msg: "Result found",
+      result,
+    });
+  } else {
+    res.json({
+      success: false,
+      msg: " Result not found",
+    });
+  }
   } catch (error) {
     res.json({
       success: false,
@@ -148,9 +158,9 @@ let getTrip = async (req, res) => {
 };
 
 let update = async (req, res) => {
-  try {
+  // try {
     const update = await Trip.findByIdAndUpdate(
-      trip_id,
+      req.params.trip_id,
       {
         $set: req.body,
       },
@@ -168,18 +178,18 @@ let update = async (req, res) => {
         msg: " Result not found",
       });
     }
-  } catch (error) {
-    res.json({
-      success: false,
-      msg: `Error occurred`,
-      error,
-    });
-  }
+  // } catch (error) {
+  //   res.json({
+  //     success: false,
+  //     msg: `Error occurred`,
+  //     error,
+  //   });
+  // }
 };
 
 let deleteTrip = async (req, res) => {
   try {
-    const deleteOp = await Trip.findByIdAndDelete(trip_id);
+    const deleteOp = await Trip.findByIdAndDelete(req.params.trip_id);
     if (deleteOp) {
       res.json({
         success: true,
