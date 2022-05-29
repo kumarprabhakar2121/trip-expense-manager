@@ -71,83 +71,38 @@ let add = async (req, res) => {
 };
 
 let getAllTrips = async (req, res) => {
-  try {
-    let page;
-    let limit;
-    page = parseInt(req.query.page) || 1;
-    limit = parseInt(req.query.limit) || 10;
-    let currentPage = page;
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-
-    const result = {};
-    result.page;
-    result.currentPage = currentPage;
-    const length = await Trip.countDocuments().exec();
-    result.total_count = length;
-    result.total_pages = Math.ceil(length / limit);
-    if (result.total_pages < page) {
-      result.msg = "Page Number exceeds limit!";
-      return res.send(result);
+  const result = await Trip.find(
+    {},
+    {
+      __v: 0,
+      createdAt: 0,
+      updatedAt: 0,
     }
-    if (endIndex < length) {
-      result.next = {
-        page: page + 1,
-        limit: limit,
-      };
-    }
-    if (startIndex > 0) {
-      result.previous = {
-        page: page - 1,
-        limit: limit,
-      };
-    }
-    try {
-      result.results = await Trip.find(
-        {},
-        {
-          __v: 0,
-          createdAt: 0,
-          updatedAt: 0,
-        }
-      )
-        .limit(limit)
-        .skip(startIndex);
-      res.paginatedResult = result;
-      return res.send(result);
-    } catch (e) {
-      return res.status(500).json({
-        message: e.message,
-      });
-    }
-  } catch (e) {
-    return res.status(500).json({
-      message: e.message,
-    });
-  }
+  );
+  res.json(result)
 };
 
 let getTrip = async (req, res) => {
   try {
-  if (!mongoose.isValidObjectId(req.params.trip_id)) {
-    return res.json({
-      success: false,
-      msg: `bad object id`,
-    });
-  }
-  const result = await Trip.findById(req.params.trip_id);
-  if (result) {
-    res.json({
-      success: true,
-      msg: "Result found",
-      result,
-    });
-  } else {
-    res.json({
-      success: false,
-      msg: " Result not found",
-    });
-  }
+    if (!mongoose.isValidObjectId(req.params.trip_id)) {
+      return res.json({
+        success: false,
+        msg: `bad object id`,
+      });
+    }
+    const result = await Trip.findById(req.params.trip_id);
+    if (result) {
+      res.json({
+        success: true,
+        msg: "Result found",
+        result,
+      });
+    } else {
+      res.json({
+        success: false,
+        msg: " Result not found",
+      });
+    }
   } catch (error) {
     res.json({
       success: false,
@@ -159,25 +114,25 @@ let getTrip = async (req, res) => {
 
 let update = async (req, res) => {
   // try {
-    const update = await Trip.findByIdAndUpdate(
-      req.params.trip_id,
-      {
-        $set: req.body,
-      },
-      { new: true, runValidator: true }
-    );
-    if (update) {
-      res.json({
-        success: true,
-        msg: "updated successfully",
-        update,
-      });
-    } else {
-      res.json({
-        success: false,
-        msg: " Result not found",
-      });
-    }
+  const update = await Trip.findByIdAndUpdate(
+    req.params.trip_id,
+    {
+      $set: req.body,
+    },
+    { new: true, runValidator: true }
+  );
+  if (update) {
+    res.json({
+      success: true,
+      msg: "updated successfully",
+      update,
+    });
+  } else {
+    res.json({
+      success: false,
+      msg: " Result not found",
+    });
+  }
   // } catch (error) {
   //   res.json({
   //     success: false,
